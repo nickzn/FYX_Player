@@ -22,14 +22,30 @@ class Player(wx.Frame):
         #Menu Bar
         self.frame_menubar = wx.MenuBar()
 
-        #Play Menu
+        #Playback Menu
         self.file_menu = wx.Menu()
         #Quit item
-        quit_item = self.file_menu.Append(2, '&Quit\tCTRL+Q', "Quit the app")
+        play_item = self.file_menu.Append(1, '&Play\tCTRL+P', "Play")
+        self.Bind(wx.EVT_MENU, self.OnPlay, play_item)
+        stop_item = self.file_menu.Append(2, '&Stop\tCTRL+S', "Stop")
+        self.Bind(wx.EVT_MENU, self.OnStop, stop_item)
+        prev_item = self.file_menu.Append(3, '&Previous\tCTRL+B', "Previous")
+        self.Bind(wx.EVT_MENU, self.OnPrevious, prev_item)
+        next_item = self.file_menu.Append(4, '&Next\tCTRL+N', "Next")
+        self.Bind(wx.EVT_MENU, self.OnNext, next_item)
+        quit_item = self.file_menu.Append(5, '&Quit\tCTRL+Q', "Quit the app")
         self.Bind(wx.EVT_MENU, self.OnQuit, quit_item)
 
         #Append Play to Menu Bar
-        self.frame_menubar.Append(self.file_menu, "&Play")
+        self.frame_menubar.Append(self.file_menu, "&Playback")
+        self.SetMenuBar(self.frame_menubar)
+
+        #Audio Menu
+        self.audio_menu = wx.Menu()
+        mute_item = self.audio_menu.Append(1, 'Mute\tCTRL+M', "Mute")
+        self.Bind(wx.EVT_MENU, self.OnToggleVolume, mute_item)
+        #Append Play to Menu Bar
+        self.frame_menubar.Append(self.audio_menu, "&Audio")
         self.SetMenuBar(self.frame_menubar)
 
         #Choice panel
@@ -56,7 +72,7 @@ class Player(wx.Frame):
 
         #Control panel
         self.ctrlpanel = wx.Panel(self, -1)
-        self.timeslider = wx.Slider(self.ctrlpanel, -1, 0, 0, 1000, pos=(5, 60), size=(500, -1))
+        self.timeslider = wx.Slider(self.ctrlpanel, -1, 0, 0, 1000, pos=(5, 50), size=(500, -1))
         self.timeslider.SetRange(0, 1000)
 
         #Image
@@ -96,7 +112,7 @@ class Player(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.info_panel, 1, flag=wx.EXPAND)
         sizer.Add(self.choice_panel, flag=wx.EXPAND | wx.TOP, border=10)
-        sizer.Add(self.ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=15)
+        sizer.Add(self.ctrlpanel, flag=wx.EXPAND | wx.BOTTOM | wx.TOP, border=10)
         self.SetSizer(sizer)
         self.SetMinSize((520, 300))
 
@@ -143,7 +159,7 @@ class Player(wx.Frame):
         # check if there is a file to play, otherwise open a
         # wx.FileDialog to select a file
         if not self.player.get_media():
-            self.SetCustom()
+            self.SetCustom(evt)
         else:
             # Try to launch the media, if this fails display an error message
             if self.player.play() == -1:
