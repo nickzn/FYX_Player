@@ -51,19 +51,27 @@ class Player(wx.Frame):
         wx.StaticText(self.choice_panel, pos=(395, 2), label='D')
         self.custom_day = wx.TextCtrl(self.choice_panel, pos=(410, 0), size=(20, -1))
         self.custom_day.AppendText(str(dates[-1].day))
-        choose = wx.Button(self.choice_panel, pos=(450, 0), label='Set', size=(50, -1))
+        choose = wx.Button(self.choice_panel, pos=(445, 0), label='Choose', size=(65, -1))
         self.Bind(wx.EVT_BUTTON, self.SetCustom, choose)
 
         #Control panel
         self.ctrlpanel = wx.Panel(self, -1)
         self.timeslider = wx.Slider(self.ctrlpanel, -1, 0, 0, 1000, pos=(5, 60), size=(500, -1))
         self.timeslider.SetRange(0, 1000)
-        play        = wx.Button(self.ctrlpanel, label="Play", pos=(5, 0), size=(50, -1))
-        pause       = wx.Button(self.ctrlpanel, label="Pause", pos=(55, 0), size=(60, -1))
-        stop        = wx.Button(self.ctrlpanel, label="Stop", pos=(115, 0), size=(50, -1))
-        next_item   = wx.Button(self.ctrlpanel, label="Next", pos=(5, 30), size=(50, -1))
-        previous_item = wx.Button(self.ctrlpanel, label="Prev", pos=(55, 30), size=(50, -1))
-        volume      = wx.Button(self.ctrlpanel, label="Mute", pos=(450, 0), size=(50, -1))
+
+        #Image
+        play_img    = wx.Image('./button/play.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        pause_img   = wx.Image('./button/pause.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        stop_img    = wx.Image('./button/stop.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        next_img    = wx.Image('./button/next.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        prev_img    = wx.Image('./button/previous.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        vol_img    = wx.Image('./button/sound_high.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+        play        = wx.BitmapButton(self.ctrlpanel, bitmap=play_img, pos=(5, 0))
+        pause       = wx.BitmapButton(self.ctrlpanel, bitmap=pause_img, pos=(50, 0))
+        stop        = wx.BitmapButton(self.ctrlpanel, bitmap=stop_img, pos=(95, 0))
+        next_item   = wx.BitmapButton(self.ctrlpanel, bitmap=next_img, pos=(140, 0))
+        previous_item   = wx.BitmapButton(self.ctrlpanel, bitmap=prev_img, pos=(185, 0))
+        volume   = wx.BitmapButton(self.ctrlpanel, bitmap=vol_img, pos=(455, 0))
         self.volslider = wx.Slider(self.ctrlpanel, -1, 0, 0, 100, pos=(340, 0), size=(100, -1))
 #
 #        # Bind controls to events
@@ -108,14 +116,16 @@ class Player(wx.Frame):
 
     def OnSelect(self, evt):
         day = evt.GetString()
+        self.d_string = day
         dat = cal.str_date(day)
         if_exist = url.res_exist(dat)
         self.NoRes(if_exist)
-        mms_urls = url.mms_url(dat)
-        self.info_playing.SetLabel(day + '  ' + url.mms_sect(mms_urls[0]))
+        self.i = 0
+        self.mms_urls = url.mms_url(dat)
+        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
         self.OnStop(None)
         self.Media_list = self.Instance.media_list_new()
-        for mms in mms_urls:
+        for mms in self.mms_urls:
             self.Media_list.add_media(self.Instance.media_new_location(mms))
         self.playerl.set_media_list(self.Media_list)
         self.playerl.set_media_player(self.player)
@@ -142,9 +152,13 @@ class Player(wx.Frame):
                 self.timer.Start()
 
     def OnNext(self, evt):
+        self.i += 1
+        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
         self.playerl.next()
 
     def OnPrevious(self, evt):
+        self.i -= 1
+        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
         self.playerl.previous()
 
     def OnPause(self, evt):
@@ -202,16 +216,17 @@ class Player(wx.Frame):
         year = self.custom_year.GetValue()
         month = self.custom_month.GetValue()
         day = self.custom_day.GetValue()
-        string = '%-4s-%2s-%-2s' % (year, month, day)
-        dat = cal.str_date(string)
+        self.d_string = '%-4s-%2s-%-2s' % (year, month, day)
+        dat = cal.str_date(self.d_string)
         if_exist = url.res_exist(dat)
         self.NoRes(if_exist)
-        mms_urls = url.mms_url(dat)
-        self.info_playing.SetLabel(string + '  ' + url.mms_sect(mms_urls[0]))
+        self.i = 0
+        self.mms_urls = url.mms_url(dat)
+        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
 
         self.OnStop(None)
         self.Media_list = self.Instance.media_list_new()
-        for mms in mms_urls:
+        for mms in self.mms_urls:
             self.Media_list.add_media(self.Instance.media_new_location(mms))
         self.playerl.set_media_list(self.Media_list)
         self.playerl.set_media_player(self.player)
