@@ -21,16 +21,25 @@ def default_dates():
     m = today.month
     d = today.day
 
-    dates = []
+    dates = get_dates(c, y, m, d, [])
+    if len(dates) >= 10:
+        dates.reverse()
+        return dates
+    dates = get_dates(c, y, m - 1, 31, dates)
+    if len(dates) >= 10:
+        dates.reverse()
+        return dates
+
+
+def get_dates(c, y, m, d, dates):
     weeks = c.monthdatescalendar(y, m)
     weeks.reverse()
     for lsts in weeks:
         lsts.reverse()
         for da in lsts:
-            if da.month <= m and is_week(da) and da.day <= d: dates.append(da)
-            if len(dates) == 10:
-                dates.reverse()
-                return dates
+            if da.month == m and is_week(da) and da.day <= d: dates.append(da)
+            if len(dates) == 10: break
+    return dates
 
 
 def is_week(d):
