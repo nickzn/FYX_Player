@@ -9,26 +9,25 @@ import re
 def res_exist(dat):
     m = add_zero(dat.month)
     d = add_zero(dat.day)
-    patt = "-%s-%s-%s-" % (dat.year, m, d)
-    f = urllib2.urlopen('http://english.cri.cn/4926/more/10679/more10679.htm')
+    patt = "<a\s*href='(.*htm)'>EZ Morning.*-%s-%s-%s-.*<\/a>" % (dat.year, m, d)
+    base_url = 'http://english.cri.cn'
+    f = urllib2.urlopen('%s/4926/more/10679/more10679.htm' % base_url)
     for line in f.readlines():
-        if re.search(r'htm\'>EZ Morning', line) and re.search(patt, line):
-            return True
+        m = re.search(patt, line)
+        if m:
+            return '%s%s' % (base_url, m.group(1))
     return False
 
 
 def mms_url(dat):
-    m = add_zero(dat.month)
-    d = add_zero(dat.day)
-    d_str = "%s/%s%s" % (dat.year, m, d)
-
-    sects = ['a', 'b', 'c']
-    pre = 'mms://media.chinabroadcast.cn/eng/music/morning/'
     urls = []
-
-    for s in sects:
-        urls.append("%s%s%s.wma" % (pre, d_str, s))
-
+    url = res_exist(dat)
+    f = urllib2.urlopen(url)
+    patt = "'file'\s*:\s*'(.*)'"
+    for line in f.readlines():
+        m = re.search(patt, line)
+        if m:
+            urls.append(m.group(1))
     return urls
 
 
@@ -45,10 +44,9 @@ def add_zero(num):
 
 
 def main():
-    d = date(2012, 7, 20)
+    d = date(2013, 6, 28)
     mms_urls = mms_url(d)
     print mms_urls
-    print res_exist(d)
     print mms_sect(mms_urls[0])
 
 
