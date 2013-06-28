@@ -138,7 +138,7 @@ class Player(wx.Frame):
         self.NoRes(if_exist)
         self.i = 0
         self.mms_urls = url.mms_url(dat)
-        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
+        self.info_playing.SetLabel(self.d_string)
         self.OnStop(None)
         self.Media_list = self.Instance.media_list_new()
         for mms in self.mms_urls:
@@ -169,12 +169,12 @@ class Player(wx.Frame):
 
     def OnNext(self, evt):
         self.i += 1
-        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
+        self.info_playing.SetLabel(self.d_string)
         self.playerl.next()
 
     def OnPrevious(self, evt):
         self.i -= 1
-        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
+        self.info_playing.SetLabel(self.d_string)
         self.playerl.previous()
 
     def OnPause(self, evt):
@@ -238,7 +238,7 @@ class Player(wx.Frame):
         self.NoRes(if_exist)
         self.i = 0
         self.mms_urls = url.mms_url(dat)
-        self.info_playing.SetLabel(self.d_string + '  ' + url.mms_sect(self.mms_urls[self.i]))
+        self.info_playing.SetLabel(self.d_string)
 
         self.OnStop(None)
         self.Media_list = self.Instance.media_list_new()
